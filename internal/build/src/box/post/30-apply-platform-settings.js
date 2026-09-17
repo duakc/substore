@@ -4,6 +4,7 @@ const applyPlatformSettings = ({ config = {}, ua = undefined, ...rest }) => {
   if (ua === undefined) {
     return ret;
   }
+
   config?.inbounds
     ?.filter((inb) => inb.type === "tun")
     .map((tunInbound) => {

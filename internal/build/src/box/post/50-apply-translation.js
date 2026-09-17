@@ -3,12 +3,6 @@ const applyTranslation = ({ config = {}, ua = undefined, ...rest }) => {
   const ret = { config, ua, ...rest };
 
   const translations = {
-    "🌐 Direct": {
-      zh_CN: "🌐 直连",
-      zh_TW: "🌐 直連",
-      fa: "🌐 اتصال مستقیم",
-      ru: "🌐 Прямое подключение",
-    },
     "🙋 Select": {
       zh_CN: "🙋 手动选择",
       zh_TW: "🙋 手動選擇",

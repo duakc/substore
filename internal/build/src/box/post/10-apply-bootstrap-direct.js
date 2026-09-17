@@ -16,7 +16,7 @@ const applyBoostrapDirect = ({ config = {}, ...rest }) => {
         )
       ) {
         ruleset.url = `https://${ghproxy}/${ruleset.url}`;
-        ruleset.http_client = context.const.ruleset.bootstrapHTTPClient;
+        ruleset.http_client = context.const.http_client.direct;
       }
     });
   }
@@ -30,7 +30,7 @@ const applyBoostrapDirect = ({ config = {}, ...rest }) => {
   ) {
     config.experimental.clash_api.external_ui_download_url = `https://${ghproxy}/${config.experimental.clash_api.external_ui_download_url}`;
     config.experimental.clash_api.external_ui_download_detour =
-      context.const.outbound.directBootstrap;
+      context.const.outbound.direct;
   }
 
   return { config, ...rest };

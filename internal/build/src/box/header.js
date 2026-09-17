@@ -2,11 +2,15 @@ context.const = {
   ...(context.const ?? {}),
   platform: "sing-box",
   outbound: {
-    direct: "🌐 Direct",
-    directBootstrap: "direct-bootstrap",
+    direct: "direct",
   },
-  ruleset: { bootstrapHTTPClient: "http-bootstrap" },
-  dns: { bootstrapDNSTag: "dns-bootstrap" },
+  http_client: {
+    direct: "http-direct",
+  },
+  dns: {
+    direct: "dns-cn",
+    ecs: "dns-ecs",
+  },
 };
 
 const produce = (proxies = []) => {
@@ -113,9 +117,7 @@ const uaLookup = (ua = "") => {
 
   if (
     !uaMatched ||
-    !["SFM", "SFI", "SFT", "SFA", "SFD", "SFW", "SFL"].includes(
-      uaMatched[1],
-    )
+    !["SFM", "SFI", "SFT", "SFA", "SFD", "SFW", "SFL"].includes(uaMatched[1])
   ) {
     return defaultUaInfo;
   }

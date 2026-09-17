@@ -37,7 +37,7 @@ const applyInternalDNSResolver = ({ config = {}, proxies = [], ...rest }) => {
     // a dns server addressed by a domain needs a bootstrap resolver to
     // look up that address itself.
     if (isDomain(singDns.server)) {
-      singDns.domain_resolver = { server: context.const.dns.bootstrapDNSTag };
+      singDns.domain_resolver = { server: context.const.dns.direct };
     }
 
     singDns.detour = context.const.outbound.direct;

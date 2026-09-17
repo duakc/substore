@@ -1182,11 +1182,15 @@ context.const = {
   ...(context.const ?? {}),
   platform: "sing-box",
   outbound: {
-    direct: "🌐 Direct",
-    directBootstrap: "direct-bootstrap",
+    direct: "direct",
   },
-  ruleset: { bootstrapHTTPClient: "http-bootstrap" },
-  dns: { bootstrapDNSTag: "dns-bootstrap" },
+  http_client: {
+    direct: "http-direct",
+  },
+  dns: {
+    direct: "dns-cn",
+    ecs: "dns-ecs",
+  },
 };
 
 const produce = (proxies = []) => {
@@ -1293,9 +1297,7 @@ const uaLookup = (ua = "") => {
 
   if (
     !uaMatched ||
-    !["SFM", "SFI", "SFT", "SFA", "SFD", "SFW", "SFL"].includes(
-      uaMatched[1],
-    )
+    !["SFM", "SFI", "SFT", "SFA", "SFD", "SFW", "SFL"].includes(uaMatched[1])
   ) {
     return defaultUaInfo;
   }
@@ -1566,7 +1568,7 @@ const applyInternalDNSResolver = ({ config = {}, proxies = [], ...rest }) => {
     // a dns server addressed by a domain needs a bootstrap resolver to
     // look up that address itself.
     if (isDomain(singDns.server)) {
-      singDns.domain_resolver = { server: context.const.dns.bootstrapDNSTag };
+      singDns.domain_resolver = { server: context.const.dns.direct };
     }
 
     singDns.detour = context.const.outbound.direct;
@@ -1740,7 +1742,7 @@ const applySyncDomainResolver = ({ config = {}, ...rest }) => {
       ) {
         tag = routeDefaultResolver.server;
       } else {
-        tag = context.const.dns.bootstrapDNSTag;
+        tag = context.const.dns.direct;
       }
     }
 
@@ -1780,7 +1782,7 @@ const applyBoostrapDirect = ({ config = {}, ...rest }) => {
         )
       ) {
         ruleset.url = `https://${ghproxy}/${ruleset.url}`;
-        ruleset.http_client = context.const.ruleset.bootstrapHTTPClient;
+        ruleset.http_client = context.const.http_client.direct;
       }
     });
   }
@@ -1794,7 +1796,7 @@ const applyBoostrapDirect = ({ config = {}, ...rest }) => {
   ) {
     config.experimental.clash_api.external_ui_download_url = `https://${ghproxy}/${config.experimental.clash_api.external_ui_download_url}`;
     config.experimental.clash_api.external_ui_download_detour =
-      context.const.outbound.directBootstrap;
+      context.const.outbound.direct;
   }
 
   return { config, ...rest };
@@ -1812,31 +1814,24 @@ const applyDnsEnhanced = ({ config = {}, experimental = {}, ...rest }) => {
       headers["x-real-ip"] ||
       headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
       req?.socket?.remoteAddress;
-    return ip === undefined ? "" : ip.trim();
+    return ip === undefined ? "114.114.114.114" : ip.trim();
   };
 
-  let ip = getClientIP();
-  if (ip === "") ip = "114.114.114.114";
-  for (const dnsRule of [...(config?.dns?.rules ?? [])]) {
-    if (
-      dnsRule.client_subnet === "0.0.0.0/0" ||
-      dnsRule.client_subnet === "::/0"
-    ) {
-      dnsRule.client_subnet = ip + (ip.includes(":") ? "/128" : "/32");
-    }
-  }
+  const clientIP = getClientIP();
+  for (const dnsRule of [...(config?.dns?.rules ?? [])])
+    if (dnsRule.client_subnet === "") dnsRule.client_subnet = clientIP;
 
   // experimental h3
   if (experimental.dns_cn_use_h3 && Array.isArray(config?.dns?.servers))
     config.dns.servers.map((dns) => {
-      if (dns.tag === "dns-cn" && dns.type === "https") dns.type = "h3";
+      if (dns.tag === context.const.dns.direct) dns.type = "h3";
     });
 
   // leak
   if (experimental.dns_leak_boost && Array.isArray(config?.dns?.rules)) {
     config.dns.rules.map((r) => {
-      if (r.server === "dns-ecs") {
-        r.server = "dns-cn";
+      if (r.server === context.const.dns.ecs) {
+        r.server = context.const.dns.direct;
         r.client_subnet = undefined;
       }
     });
@@ -1847,7 +1842,7 @@ const applyDnsEnhanced = ({ config = {}, experimental = {}, ...rest }) => {
     config.dns.servers
       .filter((server) => server.type === "local")
       .forEach((server) => (server.type = "dhcp"));
-  
+
   return { config, experimental, ...rest };
 };
 
@@ -1856,6 +1851,7 @@ const applyPlatformSettings = ({ config = {}, ua = undefined, ...rest }) => {
   if (ua === undefined) {
     return ret;
   }
+
   config?.inbounds
     ?.filter((inb) => inb.type === "tun")
     .map((tunInbound) => {
@@ -1890,12 +1886,6 @@ const applyTranslation = ({ config = {}, ua = undefined, ...rest }) => {
   const ret = { config, ua, ...rest };
 
   const translations = {
-    "🌐 Direct": {
-      zh_CN: "🌐 直连",
-      zh_TW: "🌐 直連",
-      fa: "🌐 اتصال مستقیم",
-      ru: "🌐 Прямое подключение",
-    },
     "🙋 Select": {
       zh_CN: "🙋 手动选择",
       zh_TW: "🙋 手動選擇",

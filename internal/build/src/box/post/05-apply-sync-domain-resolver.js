@@ -28,7 +28,7 @@ const applySyncDomainResolver = ({ config = {}, ...rest }) => {
       ) {
         tag = routeDefaultResolver.server;
       } else {
-        tag = context.const.dns.bootstrapDNSTag;
+        tag = context.const.dns.direct;
       }
     }
 
