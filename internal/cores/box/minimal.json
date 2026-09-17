@@ -103,6 +103,7 @@
               "geosite-category-games@cn",
               "geosite-microsoft@cn",
               "geosite-apple@cn",
+              "geosite-spotify",
               "@geosite-akamai@cn",
               "@geosite-steam@cn",
               "@geosite-google-play@cn",
@@ -279,6 +280,7 @@
           "geosite-category-games@cn",
           "geosite-microsoft@cn",
           "geosite-apple@cn",
+          "geosite-spotify",
           "@geosite-akamai@cn",
           "@geosite-steam@cn",
           "@geosite-google-play@cn",
@@ -424,6 +426,12 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-private.srs"
+      },
+      {
+        "tag": "geosite-spotify",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-spotify.srs"
       }
     ],
     "final": "🙋 Select",

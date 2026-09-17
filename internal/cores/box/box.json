@@ -160,6 +160,7 @@
               "geosite-category-games@cn",
               "geosite-microsoft@cn",
               "geosite-apple@cn",
+              "geosite-spotify",
               "@geosite-direct",
               "@geosite-akamai@cn",
               "@geosite-steam@cn",
@@ -439,6 +440,7 @@
           "geosite-category-games@cn",
           "geosite-microsoft@cn",
           "geosite-apple@cn",
+          "geosite-spotify",
           "@geosite-direct",
           "@geosite-akamai@cn",
           "@geosite-steam@cn",
@@ -866,6 +868,12 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-reddit.srs"
+      },
+      {
+        "tag": "geosite-spotify",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-spotify.srs"
       },
       {
         "tag": "geosite-telegram",
