@@ -1121,13 +1121,13 @@ const completeTransport = ({ proxies, detourName, fallback }) => {
   for (const tp of transportProxies) {
     const transportLocation = featureLocation.getLocation(tp);
 
-    if (transportGroups[transportLocation] === undefined) {
+    if (transportGroups[transportLocation] === undefined)
       transportGroups[transportLocation] = {
         use: false,
         name: detourName(transportLocation),
         proxies: [],
       };
-    }
+
     transportGroups[transportLocation].proxies.push(tp.name);
   }
 
@@ -1137,7 +1137,7 @@ const completeTransport = ({ proxies, detourName, fallback }) => {
       typeof dp.properties.destination !== "boolean" &&
       dp.properties.destination.require !== undefined
     ) {
-      if (typeof dp.properties.destination.require === "string")
+      if (typeof dp.properties.destination.requires === "string")
         destinationRequiredLocation.push(dp.properties.destination.require);
       else if (Array.isArray(dp.properties.destination.require))
         destinationRequiredLocation.push(...dp.properties.destination.require);
