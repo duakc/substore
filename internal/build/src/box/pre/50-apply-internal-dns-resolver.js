@@ -22,11 +22,15 @@ const applyInternalDNSResolver = ({ config = {}, proxies = [], ...rest }) => {
       props.port = dns.port ?? 0;
     }
 
-    const tag =
-      "dns-" +
-      [props.type, props.server, props.path, props.port]
-        .filter((v) => v)
-        .join("_");
+    let tag;
+    if (proxy.properties?.provider)
+      tag = "dns-for_provider_" + proxy.properties.provider;
+    else
+      tag =
+        "dns-" +
+        [props.type, props.server, props.path, props.port]
+          .filter((v) => v)
+          .join("_");
 
     const singDns = { type: props.type, server: props.server, tag };
     if (props.port) singDns.server_port = props.port;
@@ -40,7 +44,6 @@ const applyInternalDNSResolver = ({ config = {}, proxies = [], ...rest }) => {
       singDns.domain_resolver = { server: context.const.dns.direct };
     }
 
-    singDns.detour = context.const.outbound.direct;
     return singDns;
   };
 

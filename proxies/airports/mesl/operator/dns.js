@@ -43,7 +43,7 @@ const parseStringAsDNS = (dnsServer) => {
 
   return {
     server: jsURL.hostname,
-    server_port: jsURL.port ? parseInt(jsURL.port, 10) : 0,
+    port: jsURL.port ? parseInt(jsURL.port, 10) : 0,
     type: jsURL.protocol.replace(":", ""),
     path: jsURL.pathname,
   };
