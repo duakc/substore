@@ -3,7 +3,7 @@ const operator = (proxies, targetPlatform, context) => {
 
   for (const rawFile of context.raw ?? []) {
     const rawFileConfig = ProxyUtils.yaml.safeLoad(rawFile);
-    policy.push(...(rawFileConfig?.dns?.["proxy-server-nameserver"] || []));
+    policy.push(...(rawFileConfig?.dns?.nameserver || []));
     if (policy.length > 0) break;
   }
   if (policy.length == 0) return proxies;

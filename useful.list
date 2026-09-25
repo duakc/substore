@@ -2,6 +2,7 @@
 proxies/airports/flowercloud/operator/host.js
 proxies/airports/ikuuu/operator/dns.js
 proxies/airports/jeeyio/operator/dns.js
+proxies/airports/mesl/operator/dns.js
 
 proxies/common/operator.js
 
