@@ -90,9 +90,6 @@
           {
             "rule_set": [
               "geosite-category-ntp",
-              "geosite-category-games@cn",
-              "geosite-microsoft@cn",
-              "geosite-apple@cn",
               "@geosite-akamai@cn",
               "@geosite-steam@cn",
               "@geosite-google-play@cn",
@@ -266,9 +263,6 @@
       {
         "rule_set": [
           "geosite-category-ntp",
-          "geosite-category-games@cn",
-          "geosite-microsoft@cn",
-          "geosite-apple@cn",
           "@geosite-akamai@cn",
           "@geosite-steam@cn",
           "@geosite-google-play@cn",
@@ -368,18 +362,6 @@
         "url": "https://raw.githubusercontent.com/duakc/geoip/refs/heads/release/srs/cn.srs"
       },
       {
-        "tag": "geosite-apple@cn",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple@cn.srs"
-      },
-      {
-        "tag": "geosite-category-games@cn",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-category-games@cn.srs"
-      },
-      {
         "tag": "geosite-category-ntp",
         "type": "remote",
         "format": "binary",
@@ -402,12 +384,6 @@
         "type": "remote",
         "format": "binary",
         "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-geolocation-cn.srs"
-      },
-      {
-        "tag": "geosite-microsoft@cn",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-microsoft@cn.srs"
       },
       {
         "tag": "geosite-private",
