@@ -1,5 +1,4 @@
-// @import = location
-const featureLocation = context.features.location;
+const featureLocation = lib.location;
 
 const isTransport = ({ proxy }) => {
   return proxy?.properties?.transport || proxy?.properties?.transport?.is;
@@ -83,11 +82,8 @@ const completeTransport = ({ proxies, detourName, fallback }) => {
   return transportGroups;
 };
 
-context.features = {
-  ...(context.features ?? {}),
-  transport: {
-    completeTransport,
-    isTransport,
-    isDestionation,
-  },
+lib.transport = {
+  completeTransport,
+  isTransport,
+  isDestionation,
 };

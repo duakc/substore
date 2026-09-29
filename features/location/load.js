@@ -1064,14 +1064,11 @@ const sortProxies = ({ proxies }) => {
   return finalProxies;
 };
 
-context.features = {
-  ...(context.features ?? {}),
-  location: {
-    getFull,
-    getLocation,
-    getOrder,
-    getArea,
-    sortProxies,
-    locationEntries,
-  },
+lib.location = {
+  getFull,
+  getLocation,
+  getOrder,
+  getArea,
+  sortProxies,
+  locationEntries,
 };

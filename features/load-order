@@ -1,4 +1,4 @@
 # Feature load order (dependencies first).
-# Consumed by internal/build/main.js to inline features into buildbox/buildcat.
+# Consumed by script/bundle-build to inline libraries into buildbox.
 location
 transport

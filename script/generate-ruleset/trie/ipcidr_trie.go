@@ -1,9 +1,8 @@
 package trie
 
 import (
+	"log"
 	"net"
-
-	"github.com/metacubex/mihomo/log"
 )
 
 type IPV6 bool
@@ -152,7 +151,7 @@ func addIpv4Cidr(trie *IpCidrTrie, ip net.IP, groupSize int) {
 		if !node.hasChild(groupValue) {
 			err := node.addChild(groupValue)
 			if err != nil {
-				log.Errorln(err.Error())
+				log.Println(err.Error())
 			}
 		}
 
@@ -197,7 +196,7 @@ func addIpv6Cidr(trie *IpCidrTrie, ip net.IP, groupSize int) {
 		if !node.hasChild(groupValue) {
 			err := node.addChild(groupValue)
 			if err != nil {
-				log.Errorln(err.Error())
+				log.Println(err.Error())
 			}
 		}
 

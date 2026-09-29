@@ -1,13 +1,43 @@
-// @call = generateContext()
-const generateContext = async () => {
+const assembledConfigs = new WeakSet();
+
+const assembleConfig = ({
+  config = {},
+  proxies = [],
+  endpoints = [],
+  lib,
+  constant = {},
+}) => {
+  if (assembledConfigs.has(config)) return config;
+  const assembled = {
+    ...config,
+    outbounds: [
+      ...(config.outbounds ?? []),
+      ...lib.default.produce(proxies, constant),
+    ],
+    endpoints: [
+      ...(config.endpoints ?? []),
+      ...lib.default.produceEndpoint(endpoints, constant),
+    ],
+  };
+  assembledConfigs.add(assembled);
+  return assembled;
+};
+
+const entrypoint = async ({ context = {}, lib, constant = {}, ...rest } = {}) => {
   const lookupQuery = (name) => {
     return $options?._req?.query?.[name];
   };
+  const sourceContent =
+    typeof $content === "string" && $content.trim() !== ""
+      ? $content.trim()
+      : Array.isArray($files)
+        ? $files[0]
+        : "{}";
 
   const generated = {
-    config: JSON.parse($files[0]),
+    config: JSON.parse(sourceContent || "{}"),
     experimental: {},
-    ua: uaLookup(
+    ua: lib.default.uaLookup(
       $options?._req?.headers?.["user-agent"] ||
         $options?._req?.headers?.["User-Agent"] ||
         context.test?.ua,
@@ -53,5 +83,30 @@ const generateContext = async () => {
       generated.experimental[fe] = true;
     });
 
-  return generated;
+  return { ...rest, ...generated };
+};
+
+const postEntrypoint = ({
+  config = {},
+  proxies = [],
+  endpoints = [],
+  lib,
+  constant = {},
+  context,
+  ...rest
+}) => {
+  const assembledConfig = assembleConfig({
+    config,
+    proxies,
+    endpoints,
+    lib,
+    constant,
+  });
+  const assembled = {
+    ...rest,
+    config: assembledConfig,
+  };
+  // The entry post step is the final stack item, so emit after all post steps.
+  $content = JSON.stringify(assembled.config);
+  return assembled;
 };

@@ -44,15 +44,11 @@ func main() {
 		log.Fatalln(err)
 	}
 	for _, c := range v.Cores {
-		var err error
-		switch c.Type {
-		case "box":
-			err = downloadBox(c)
-		case "cat":
-			err = downloadCat(c)
-		default:
-			err = fmt.Errorf("unknown type: %s", c.Type)
+		if c.Type != "box" {
+			log.Printf("skipping unsupported core type: %s", c.Type)
+			continue
 		}
+		err := downloadBox(c)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -108,32 +104,4 @@ func downloadBox(c Core) error {
 		}
 	}
 	return nil
-}
-
-func downloadCat(c Core) error {
-	target := runtime.GOOS + "-" + runtime.GOARCH
-	distUrl := fmt.Sprintf("https://github.com/MetaCubeX/mihomo/releases/download/v%s/mihomo-%s-v%s.gz", c.Version, target, c.Version)
-
-	resp, err := http.Get(distUrl)
-	if err != nil {
-		return fmt.Errorf("download %s: %w", distUrl, err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("bad status code %s: %d", distUrl, resp.StatusCode)
-	}
-	gzipReadr, err := gzip.NewReader(resp.Body)
-	if err != nil {
-		return fmt.Errorf("gzip: %w", err)
-	}
-	destination := filepath.Join(output, c.BinaryName)
-	file, err := os.OpenFile(destination, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0777)
-	if err != nil {
-		return err
-	}
-	_, err = io.Copy(file, gzipReadr)
-	if err != nil {
-		return err
-	}
-	return file.Close()
 }

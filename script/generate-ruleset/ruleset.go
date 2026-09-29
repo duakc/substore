@@ -19,7 +19,6 @@ var (
 type RuleSet interface {
 	Count() int64
 	WriteSRS(w io.Writer, format string) error
-	WriteMRS(w io.Writer, format string, behavior int) error
 }
 
 var (

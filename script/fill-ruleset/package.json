@@ -9,7 +9,5 @@
   "scripts": {
     "run": "node main.js"
   },
-  "dependencies": {
-    "js-yaml": "^4.1.1"
-  }
+  "dependencies": {}
 }

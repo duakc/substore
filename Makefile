@@ -23,12 +23,10 @@ check:
 	.test/bin/sing-box check -c internal/cores/box/box.min.json
 	.test/bin/sing-box check -c internal/cores/box/enhanced.min.json
 	.test/bin/sing-box check -c internal/cores/box/minimal.min.json
-	.test/bin/mihomo -t -f internal/cores/cat/cat.yaml
-	.test/bin/mihomo -t -f internal/cores/cat/cat.min.yaml
 
 .PHONY: ruleset
 ruleset: clean_ruleset
-	cd script/generate-ruleset && go mod tidy && RULESET_SILENT_WARN=1 go run . --from "../../ruleset/data" --output "../../ruleset" --srs --mrs --all
+	cd script/generate-ruleset && go mod tidy && RULESET_SILENT_WARN=1 go run . --from "../../ruleset/data" --output "../../ruleset" --srs --all
 	cd script/fill-ruleset && pnpm install && node main.js
 
 .PHONY: clean_ruleset

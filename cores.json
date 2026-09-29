@@ -4,11 +4,6 @@
       "type": "box",
       "binary_name": "sing-box",
       "version": "1.14.1"
-    },
-    {
-      "type": "cat",
-      "binary_name": "mihomo",
-      "version": "1.19.27"
     }
   ]
 }

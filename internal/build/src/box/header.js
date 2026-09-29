@@ -1,5 +1,4 @@
-context.const = {
-  ...(context.const ?? {}),
+Object.assign(constant, {
   platform: "sing-box",
   outbound: {
     direct: "direct",
@@ -11,14 +10,14 @@ context.const = {
     direct: "dns-cn",
     ecs: "dns-ecs",
   },
-};
+});
 
-const produce = (proxies = []) => {
-  return JSON.parse(ProxyUtils.produce([...proxies], context.const.platform))
+const produce = (proxies = [], targetConstant = constant) => {
+  return JSON.parse(ProxyUtils.produce([...proxies], targetConstant.platform))
     .outbounds;
 };
 
-const produceEndpoint = (endpoints = []) => {
+const produceEndpoint = (endpoints = [], targetConstant = constant) => {
   return JSON.parse(
     ProxyUtils.produce(
       [
@@ -26,7 +25,7 @@ const produceEndpoint = (endpoints = []) => {
           (e) => e.type === "tailscale" || e.type === "wireguard",
         ),
       ],
-      context.const.platform,
+      targetConstant.platform,
     ),
   ).endpoints;
 };
@@ -138,4 +137,15 @@ const uaLookup = (ua = "") => {
 const findTun = (config = {}) => {
   const found = (config?.inbounds ?? []).filter((inb) => inb.type === "tun");
   return found.length > 0 ? found[0] : undefined;
+};
+
+lib.default = {
+  produce,
+  produceEndpoint,
+  createSemverInfo,
+  parseSemver,
+  createUaInfo,
+  applyUaLanguage,
+  uaLookup,
+  findTun,
 };

@@ -10,11 +10,6 @@ const scriptTargets = [
     source: "internal/buildbox.js",
     output: "internal/buildbox.min.js",
   },
-  {
-    core: "cat",
-    source: "internal/buildcat.js",
-    output: "internal/buildcat.min.js",
-  },
 ];
 const targets = [
   {
@@ -31,11 +26,6 @@ const targets = [
     source: "internal/cores/box/minimal.json",
     output: "internal/cores/box/minimal.min.json",
     format: "json",
-  },
-  {
-    source: "internal/cores/cat/cat.yaml",
-    output: "internal/cores/cat/cat.min.yaml",
-    format: "yaml",
   },
 ];
 

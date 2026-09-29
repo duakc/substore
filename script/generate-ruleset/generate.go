@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/binary"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -12,10 +11,7 @@ import (
 )
 
 var (
-	silentWarn = os.Getenv("RULESET_SILENT_WARN") != ""
-
 	generateSRS  bool
-	generateMRS  bool
 	generateAll  bool
 	providerPath string
 	outputPath   string
@@ -31,8 +27,7 @@ var alwaysfalse bool
 
 func main() {
 	flag.BoolVar(&generateSRS, "srs", false, "Generate SRS")
-	flag.BoolVar(&generateMRS, "mrs", false, "Generate MRS")
-	flag.BoolVar(&generateAll, "all", false, "Generate all format SRS/MRS")
+	flag.BoolVar(&generateAll, "all", false, "Generate all SRS formats")
 	flag.StringVar(&providerPath, "from", "./data/", "Setup datasource")
 	flag.StringVar(&outputPath, "output", "./output/", "Setup output")
 	flag.Usage = func() {
@@ -40,15 +35,17 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
-	if !generateSRS && !generateMRS {
+	if !generateSRS {
 		flag.Usage()
 		return
 	}
+
 	var entries []Entry
 	err := filepath.WalkDir(providerPath, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || entry.IsDir() || !entry.Type().IsRegular() {
 			return err
 		}
+
 		var (
 			ruleset RuleSet
 			typ     string
@@ -57,42 +54,26 @@ func main() {
 		case "domain":
 			typ = "domain"
 			ruleset, err = NewDomainFile(path)
-			if err != nil {
-				return err
-			}
 		case "ip":
 			typ = "ip"
 			ruleset, err = NewIPFile(path)
-			if err != nil {
-				return err
-			}
 		default:
-			_, _ = fmt.Fprintf(os.Stderr, "[ERROR] unable to determined rule type for %s\n", path)
+			_, _ = fmt.Fprintf(os.Stderr, "[ERROR] unable to determine rule type for %s\n", path)
 			return nil
 		}
+		if err != nil {
+			return err
+		}
 		entries = append(entries, Entry{Ruleset: ruleset, Name: entry.Name(), Type: typ})
-
 		return nil
 	})
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "[ERROR] %s\n", err.Error())
 		return
 	}
-	if generateSRS {
-		err := generateSRSFunc(entries)
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "[ERROR] %s\n", err.Error())
-			return
-		}
+	if err := generateSRSFunc(entries); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "[ERROR] %s\n", err.Error())
 	}
-	if generateMRS {
-		err := generateMRSFunc(entries)
-		if err != nil {
-			_, _ = fmt.Fprintf(os.Stderr, "[ERROR] %s\n", err.Error())
-			return
-		}
-	}
-
 }
 
 func generateSRSFunc(entries []Entry) error {
@@ -100,12 +81,11 @@ func generateSRSFunc(entries []Entry) error {
 	if generateAll {
 		formatList = append(formatList, SRSFormatJSON)
 	}
-	for _, E := range entries {
-		for _, F := range formatList {
-			path := filepath.Join(outputPath, E.Type, "srs", E.Name+SRSFormatToSuffix(F))
-
+	for _, entry := range entries {
+		for _, format := range formatList {
+			path := filepath.Join(outputPath, entry.Type, "srs", entry.Name+SRSFormatToSuffix(format))
 			if err := openWrite(path, func(w io.Writer) error {
-				return E.Ruleset.WriteSRS(w, F)
+				return entry.Ruleset.WriteSRS(w, format)
 			}); err != nil {
 				return err
 			}
@@ -114,57 +94,8 @@ func generateSRSFunc(entries []Entry) error {
 	return nil
 }
 
-func generateMRSFunc(entries []Entry) error {
-	for _, E := range entries {
-		var (
-			behaviors []int
-
-			formats = []string{MRSFormatBinary}
-		)
-
-		switch E.Type {
-		case "ip":
-			behaviors = []int{MRSRuleBehaviorIP}
-		case "domain":
-			behaviors = []int{MRSRuleBehaviorDomain}
-		}
-		if generateAll {
-			behaviors = append(behaviors, MRSRuleBehaviorClassical)
-			formats = append(formats, MRSFormatText, MRSFormatYAML)
-		}
-		for _, B := range behaviors {
-			for _, F := range formats {
-				if B == MRSRuleBehaviorClassical && F == MRSFormatBinary {
-					//_ ,_ = fmt.Fprintf(os.Stderr,
-					//	"[WARN] MRSFormatBinary doesn't support MRSRuleBehaviorClassical behavior: type=%s name=%s\n",
-					//	E.Type,E.Name)
-					continue
-				}
-				path := filepath.Join(outputPath, E.Type, "mrs", E.Name+MRSFormatToSuffix(F, B))
-
-				if err := openWrite(path, func(w io.Writer) error {
-					return E.Ruleset.WriteMRS(w, F, B)
-				}); err != nil {
-					if errors.Is(err, ErrDomainNotSupport) {
-						if !silentWarn {
-							_, _ = fmt.Fprintf(os.Stderr,
-								"[WARN] %s, so %s/%s will only generate behavior-classical file: generate %s\n",
-								err.Error(), E.Type, E.Name, path)
-						}
-
-						continue
-					}
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
 func openWrite(path string, then func(w io.Writer) error) error {
-	err := os.MkdirAll(filepath.Dir(path), 0777)
-	if err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0777); err != nil {
 		return fmt.Errorf("mkdir: %w", err)
 	}
 	output, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
@@ -172,7 +103,6 @@ func openWrite(path string, then func(w io.Writer) error) error {
 		return err
 	}
 	defer output.Close()
-
 	return then(output)
 }
 
@@ -182,19 +112,20 @@ type writeBinaryOperation struct {
 	Ending binary.ByteOrder
 }
 
-func writeGuard(w io.Writer, wbos ...writeBinaryOperation) error {
+func writeGuard(w io.Writer, operations ...writeBinaryOperation) error {
 	var err error
-	for i := 0; i < len(wbos) && err == nil; i++ {
-		op := wbos[i]
-		if op.Ending != nil {
-			err = binary.Write(w, op.Ending, op.Binary)
+	for _, operation := range operations {
+		if operation.Ending != nil {
+			err = binary.Write(w, operation.Ending, operation.Binary)
 		}
 		if err != nil {
-			break
+			return err
 		}
-		if len(op.Bytes) != 0 {
-			_, err = w.Write(op.Bytes)
+		if len(operation.Bytes) != 0 {
+			if _, err = w.Write(operation.Bytes); err != nil {
+				return err
+			}
 		}
 	}
-	return err
+	return nil
 }

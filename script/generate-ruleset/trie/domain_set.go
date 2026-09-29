@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/metacubex/mihomo/common/utils"
 	"github.com/openacid/low/bitmap"
 )
 
@@ -29,7 +28,7 @@ type qElt struct{ s, e, col int }
 func (t *DomainTrie[T]) NewDomainSet() *DomainSet {
 	reserveDomains := make([]string, 0)
 	t.Foreach(func(domain string, data T) bool {
-		reserveDomains = append(reserveDomains, utils.Reverse(domain))
+		reserveDomains = append(reserveDomains, reverseString(domain))
 		return true
 	})
 	// ensure that the same prefix is continuous
@@ -75,7 +74,7 @@ func (ss *DomainSet) Has(key string) bool {
 	if ss == nil {
 		return false
 	}
-	key = utils.Reverse(key)
+	key = reverseString(key)
 	key = strings.ToLower(key)
 	// no more labels in this node
 	// skip character matching
@@ -168,8 +167,16 @@ func (ss *DomainSet) keys(f func(key string) bool) {
 
 func (ss *DomainSet) Foreach(f func(key string) bool) {
 	ss.keys(func(key string) bool {
-		return f(utils.Reverse(key))
+		return f(reverseString(key))
 	})
+}
+
+func reverseString(value string) string {
+	runes := []rune(value)
+	for left, right := 0, len(runes)-1; left < right; left, right = left+1, right-1 {
+		runes[left], runes[right] = runes[right], runes[left]
+	}
+	return string(runes)
 }
 
 // MatchDomain implements C.DomainMatcher
