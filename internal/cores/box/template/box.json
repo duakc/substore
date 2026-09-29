@@ -601,23 +601,23 @@
     },
     {
       "type": "selector",
-      "tag": "✈️ TelegramDC1(NA)",
+      "tag": "✈️ TelegramDC5(AP)",
       "outbounds": ["🙋 Select"],
       "default": "🙋 Select",
+      "interrupt_exist_connections": true
+    },
+    {
+      "type": "selector",
+      "tag": "✈️ TelegramDC1(NA)",
+      "outbounds": ["✈️ TelegramDC5(AP)","🙋 Select"],
+      "default": "✈️ TelegramDC5(AP)",
       "interrupt_exist_connections": true
     },
     {
       "type": "selector",
       "tag": "✈️ TelegramDC4(EU)",
-      "outbounds": ["🙋 Select"],
-      "default": "🙋 Select",
-      "interrupt_exist_connections": true
-    },
-    {
-      "type": "selector",
-      "tag": "✈️ TelegramDC5(AP)",
-      "outbounds": ["🙋 Select"],
-      "default": "🙋 Select",
+      "outbounds": ["✈️ TelegramDC5(AP)","🙋 Select"],
+      "default": "✈️ TelegramDC5(AP)",
       "interrupt_exist_connections": true
     }
   ]
